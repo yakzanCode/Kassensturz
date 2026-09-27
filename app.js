@@ -1,8 +1,9 @@
 // Kassensturz – browser UI. No network requests: everything stays on this computer.
 import {
   COINS, NOTES, ALL, parseQuantity, sanitizeInput, lineCents, formatEuro,
-  formatLineValue, totalCents, baseFilename, numberedFilename, buildText,
+  formatLineValue, baseFilename, numberedFilename, buildText,
 } from "./calc.js";
+import { writeToFolder, download } from "./storage.js";
 
 const $ = (id) => document.getElementById(id);
 const rows = []; // { denom, input, value }
@@ -127,21 +128,32 @@ function ask(title, text, buttons, { cancel = null, error = false } = {}) {
   dlg.classList.toggle("error", error);
   const bar = $("dialog-buttons");
   bar.replaceChildren();
-  let focusBtn = null;
-  buttons.forEach((b, i) => {
-    const btn = document.createElement("button");
-    btn.className = b.primary ? "btn btn-primary" : "btn";
-    btn.value = String(i);
-    btn.textContent = b.label;
-    bar.append(btn);
-    if (b.primary) focusBtn = btn;
-  });
   return new Promise((resolve) => {
-    dlg.addEventListener("close", () => {
-      const i = Number.parseInt(dlg.returnValue, 10);
-      dlg.returnValue = "";
-      resolve(Number.isInteger(i) && buttons[i] ? buttons[i].value : cancel);
-    }, { once: true });
+    // Resolve directly from the click / key press instead of the dialog's
+    // "close" event: some browsers deliver that event late (e.g. in background
+    // windows), and a late event could then answer the *next* dialog.
+    let done = false;
+    const settle = (value) => {
+      if (done) return;
+      done = true;
+      dlg.removeEventListener("keydown", onKey);
+      if (dlg.open) dlg.close();
+      resolve(value);
+    };
+    const onKey = (e) => {
+      if (e.key === "Escape") { e.preventDefault(); settle(cancel); }
+    };
+    let focusBtn = null;
+    for (const b of buttons) {
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = b.primary ? "btn btn-primary" : "btn";
+      btn.textContent = b.label;
+      btn.addEventListener("click", () => settle(b.value));
+      bar.append(btn);
+      if (b.primary) focusBtn = btn;
+    }
+    dlg.addEventListener("keydown", onKey);
     dlg.showModal();
     (focusBtn ?? bar.firstElementChild).focus();
   });
@@ -214,36 +226,6 @@ async function ensurePermission(handle) {
   const opts = { mode: "readwrite" };
   if ((await handle.queryPermission(opts)) === "granted") return true;
   return (await handle.requestPermission(opts)) === "granted";
-}
-
-/** Writes into the chosen folder without ever overwriting: base.txt, base_2.txt, ... */
-async function writeToFolder(handle, base, text) {
-  for (let n = 1; n <= 999; n++) {
-    const name = numberedFilename(base, n);
-    try {
-      await handle.getFileHandle(name); // exists -> try next number
-      continue;
-    } catch (e) {
-      if (e?.name !== "NotFoundError") throw e;
-    }
-    const file = await handle.getFileHandle(name, { create: true });
-    const w = await file.createWritable();
-    await w.write(new Blob([text], { type: "text/plain;charset=utf-8" }));
-    await w.close();
-    return name;
-  }
-  throw new Error("Zu viele Dateien für diesen Tag");
-}
-
-function download(name, text) {
-  const url = URL.createObjectURL(new Blob([text], { type: "text/plain;charset=utf-8" }));
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = name;
-  document.body.append(a);
-  a.click();
-  a.remove();
-  setTimeout(() => URL.revokeObjectURL(url), 5000);
 }
 
 // ------------------------------------------------------------------ actions
