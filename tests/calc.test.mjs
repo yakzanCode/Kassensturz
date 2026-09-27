@@ -94,3 +94,24 @@ test("TXT content matches the desktop app", () => {
   }
   assert.ok(!/(?<!\r)\n/.test(text), "only CRLF line endings");
 });
+
+test("English formats", () => {
+  assert.equal(c.formatEuro(82588, "en"), "€825.88");
+  assert.equal(c.formatEuro(123456789, "en"), "€1,234,567.89");
+  assert.equal(c.formatCent(1, "en"), "1 cent");
+  assert.equal(c.formatCent(50000, "en"), "50,000 cents");
+  assert.equal(c.formatLineValue(byLabel["20 Cent"], 12, "en"), "240 cents");
+  assert.equal(c.formatLineValue(byLabel["2 Euro"], 11, "en"), "€22.00");
+  assert.equal(c.denomName(byLabel["50 Euro"], "en"), "50 euro");
+  assert.equal(c.groupThousands(1234567, "en"), "1,234,567");
+  assert.equal(c.groupThousands(1234567), "1.234.567");
+});
+
+test("English TXT matches the desktop app", () => {
+  const text = c.buildText(q(EXAMPLE), DAY, "en");
+  assert.ok(text.startsWith("Cash count – 26/09/2026\r\n"));
+  for (const l of ["Coins", "Banknotes", "20 cent: 12 pcs = 240 cents", "1 euro: 15 pcs = €15.00", "Total: €825.88"]) {
+    assert.ok(text.includes(`\r\n${l}\r\n`), l);
+  }
+  assert.equal(c.baseFilename(DAY), "26-09-2026_Kassensturz"); // same file name in every language
+});

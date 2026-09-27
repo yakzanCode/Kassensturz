@@ -1,9 +1,9 @@
 // Service worker: keeps a copy of the app so it also opens without internet.
 // Strategy "stale-while-revalidate": answer from the cache immediately and
 // refresh the cache in the background, so updates arrive on the next visit.
-const CACHE = "kassensturz-v2";
+const CACHE = "kassensturz-v3";
 const ASSETS = [
-  "./", "index.html", "style.css", "app.js", "calc.js", "storage.js", "manifest.webmanifest",
+  "./", "index.html", "style.css", "app.js", "calc.js", "storage.js", "i18n.js", "manifest.webmanifest",
   "assets/favicon.ico", "assets/icon-192.png", "assets/icon-512.png", "assets/apple-touch-icon.png",
   ...["coin_1_cent", "coin_2_cent", "coin_5_cent", "coin_10_cent", "coin_20_cent", "coin_50_cent",
     "coin_1_euro", "coin_2_euro", "note_5_euro", "note_10_euro", "note_20_euro", "note_50_euro",

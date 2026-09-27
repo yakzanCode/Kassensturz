@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>Kassensturz</title>
-  <meta name="description" content="Kassensturz – Münzen und Scheine zählen, Summe automatisch berechnen, als TXT speichern.">
+  <meta name="description" content="Kassensturz / Cash Counter – Münzen und Scheine zählen, Summe automatisch berechnen, als TXT speichern. Count coins and banknotes, get the total, save as TXT.">
   <meta name="theme-color" content="#FFFFFF">
   <link rel="icon" href="assets/favicon.ico" sizes="any">
   <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
@@ -27,21 +27,25 @@
 
   <header class="appbar">
     <div class="appbar-inner">
-      <a class="brand" href="./" aria-label="Kassensturz – Startseite">
+      <a class="brand" href="./">
         <img src="assets/icon-192.png" alt="" width="36" height="36">
         <span class="brand-text">
-          <span class="brand-name">Kassensturz</span>
+          <span class="brand-name" data-i18n="app_title">Kassensturz</span>
           <span class="brand-date" id="today"></span>
         </span>
       </a>
-      <nav class="appbar-actions" aria-label="Aktionen">
-        <a class="btn btn-ghost hide-sm" href="#desktop-app">
+      <nav class="appbar-actions">
+        <div class="lang-switch" role="group" data-i18n-aria="language">
+          <button type="button" class="lang-btn" data-lang="de" aria-pressed="true" title="Deutsch">DE</button>
+          <button type="button" class="lang-btn" data-lang="en" aria-pressed="false" title="English">EN</button>
+        </div>
+        <a class="btn btn-ghost hide-md" href="#desktop-app">
           <svg class="icon" aria-hidden="true"><use href="#i-download"/></svg>
-          <span>Desktop-App</span>
+          <span data-i18n="desktop_app">Desktop-App</span>
         </a>
-        <button type="button" class="btn btn-ghost" id="open-settings" aria-label="Einstellungen">
+        <button type="button" class="btn btn-ghost" id="open-settings" data-i18n-aria="settings">
           <svg class="icon" aria-hidden="true"><use href="#i-settings"/></svg>
-          <span class="hide-sm">Einstellungen</span>
+          <span class="hide-sm" data-i18n="settings">Einstellungen</span>
         </button>
       </nav>
     </div>
@@ -50,7 +54,7 @@
   <main class="layout">
     <section class="card" aria-labelledby="h-coins">
       <header class="card-head">
-        <h2 id="h-coins">Münzen</h2>
+        <h2 id="h-coins" data-i18n="coins">Münzen</h2>
         <output class="chip" data-out="coins">0,00 €</output>
       </header>
       <div class="rows" id="coin-rows"></div>
@@ -58,37 +62,37 @@
 
     <section class="card" aria-labelledby="h-notes">
       <header class="card-head">
-        <h2 id="h-notes">Scheine</h2>
+        <h2 id="h-notes" data-i18n="notes">Scheine</h2>
         <output class="chip" data-out="notes">0,00 €</output>
       </header>
       <div class="rows" id="note-rows"></div>
     </section>
 
-    <aside class="summary" aria-label="Zusammenfassung">
+    <aside class="summary" data-i18n-aria="summary">
       <div class="summary-total">
-        <span class="summary-caption">Gesamt</span>
+        <span class="summary-caption" data-i18n="total">Gesamt</span>
         <output id="total" data-out="total" aria-live="polite">0,00 €</output>
       </div>
       <dl class="summary-list">
-        <div><dt>Münzen</dt><dd data-out="coins">0,00 €</dd></div>
-        <div><dt>Scheine</dt><dd data-out="notes">0,00 €</dd></div>
-        <div><dt>Stück gezählt</dt><dd data-out="pieces">0</dd></div>
+        <div><dt data-i18n="coins">Münzen</dt><dd data-out="coins">0,00 €</dd></div>
+        <div><dt data-i18n="notes">Scheine</dt><dd data-out="notes">0,00 €</dd></div>
+        <div><dt data-i18n="pieces">Stück gezählt</dt><dd data-out="pieces">0</dd></div>
       </dl>
       <div class="summary-actions">
         <button type="button" class="btn btn-primary btn-lg" id="save">
           <svg class="icon" aria-hidden="true"><use href="#i-save"/></svg>
-          <span>Speichern</span>
+          <span data-i18n="save">Speichern</span>
         </button>
-        <button type="button" class="btn btn-secondary btn-lg" id="reset" aria-label="Zurücksetzen">
+        <button type="button" class="btn btn-secondary btn-lg" id="reset" data-i18n-aria="reset">
           <svg class="icon" aria-hidden="true"><use href="#i-reset"/></svg>
-          <span class="reset-label">Zurücksetzen</span>
+          <span class="reset-label" data-i18n="reset">Zurücksetzen</span>
         </button>
       </div>
-      <button type="button" class="save-location" id="save-location">
+      <button type="button" class="save-location" id="save-location" data-i18n-title="change_location">
         <svg class="icon" aria-hidden="true"><use href="#i-folder"/></svg>
         <span id="save-hint"></span>
       </button>
-      <p class="shortcut-hint">Tipp: <kbd>Enter</kbd> springt zum nächsten Feld, <kbd>Strg</kbd>+<kbd>S</kbd> speichert.</p>
+      <p class="shortcut-hint"><span data-i18n="tip">Tipp:</span> <kbd>Enter</kbd> <span data-i18n="tip_next">springt zum nächsten Feld,</span> <kbd data-i18n="ctrl">Strg</kbd>+<kbd>S</kbd> <span data-i18n="tip_save">speichert.</span></p>
     </aside>
   </main>
 
@@ -98,31 +102,29 @@
         <svg class="icon icon-xl"><use href="#i-monitor"/></svg>
       </div>
       <div class="desktop-app-text">
-        <h2 id="h-desktop">Kassensturz als Desktop-App</h2>
-        <p>Das gleiche Programm für Windows – startet ohne Browser, funktioniert komplett offline
-          und speichert direkt in einen Ordner Ihrer Wahl.</p>
+        <h2 id="h-desktop" data-i18n="dl_title">Kassensturz als Desktop-App</h2>
+        <p data-i18n="dl_text">Das gleiche Programm für Windows – startet ohne Browser, funktioniert komplett offline und speichert direkt in einen Ordner Ihrer Wahl.</p>
         <ul class="features">
-          <li><svg class="icon" aria-hidden="true"><use href="#i-wifi-off"/></svg>Ohne Internet nutzbar</li>
-          <li><svg class="icon" aria-hidden="true"><use href="#i-shield"/></svg>Keine Administratorrechte nötig</li>
-          <li><svg class="icon" aria-hidden="true"><use href="#i-folder"/></svg>TXT-Dateien im gewählten Ordner</li>
+          <li><svg class="icon" aria-hidden="true"><use href="#i-wifi-off"/></svg><span data-i18n="dl_f1">Ohne Internet nutzbar</span></li>
+          <li><svg class="icon" aria-hidden="true"><use href="#i-shield"/></svg><span data-i18n="dl_f2">Keine Administratorrechte nötig</span></li>
+          <li><svg class="icon" aria-hidden="true"><use href="#i-folder"/></svg><span data-i18n="dl_f3">TXT-Dateien im gewählten Ordner</span></li>
         </ul>
       </div>
       <div class="desktop-app-cta">
         <a class="btn btn-primary btn-lg" id="download-setup"
            href="downloads/Kassensturz_Setup_1.0.0.exe" download type="application/vnd.microsoft.portable-executable">
           <svg class="icon" aria-hidden="true"><use href="#i-download"/></svg>
-          <span>Für Windows herunterladen</span>
+          <span data-i18n="dl_button">Für Windows herunterladen</span>
         </a>
-        <p class="meta">Version 1.0.0 · 13,7 MB · Windows 10 / 11</p>
+        <p class="meta" data-i18n="dl_meta">Version 1.0.0 · 13,2 MB · Windows 10 / 11</p>
         <details class="install-help">
-          <summary>Hinweise zur Installation</summary>
+          <summary data-i18n="dl_help">Hinweise zur Installation</summary>
           <ol>
-            <li>Die heruntergeladene Datei <code>Kassensturz_Setup_1.0.0.exe</code> öffnen.</li>
-            <li>„Nur für mich installieren“ wählen – keine Administratorrechte nötig.</li>
-            <li>Falls Windows „Der Computer wurde durch Windows geschützt“ meldet: Das Programm ist
-              nicht digital signiert. Bei Firmen-PCs ggf. die IT-Abteilung fragen.</li>
+            <li data-i18n="dl_step1">Die heruntergeladene Datei Kassensturz_Setup_1.0.0.exe öffnen.</li>
+            <li data-i18n="dl_step2">„Nur für mich installieren“ wählen – keine Administratorrechte nötig.</li>
+            <li data-i18n="dl_step3">Falls Windows „Der Computer wurde durch Windows geschützt“ meldet: Das Programm ist nicht digital signiert.</li>
           </ol>
-          <p class="checksum">SHA-256: <code>D0C6AF546E877D09C0A06A419C7CFB00FD1F3165802CC258425D0058E501DB48</code></p>
+          <p class="checksum"><span data-i18n="checksum">Prüfsumme (SHA-256):</span> <code>8588CFD9704ADD8C2A04654F04D5B4F6E7DF914F39231F25A170D3EA123597B1</code></p>
         </details>
       </div>
     </div>
@@ -130,10 +132,10 @@
 
   <footer class="site-footer">
     <svg class="icon" aria-hidden="true"><use href="#i-shield"/></svg>
-    Alle Eingaben bleiben auf diesem Gerät. Diese Seite sendet keine Daten ins Internet.
+    <span data-i18n="footer">Alle Eingaben bleiben auf diesem Gerät. Diese Seite sendet keine Daten ins Internet.</span>
   </footer>
 
-  <noscript><p class="noscript">Bitte JavaScript aktivieren, um Kassensturz zu verwenden.</p></noscript>
+  <noscript><p class="noscript">Bitte JavaScript aktivieren. · Please enable JavaScript.</p></noscript>
 
   <!-- Question / message dialog -->
   <dialog id="dialog" aria-labelledby="dialog-title">
@@ -147,19 +149,19 @@
   <!-- Settings -->
   <dialog id="settings" aria-labelledby="settings-title">
     <form method="dialog">
-      <h3 id="settings-title">Speicherort</h3>
+      <h3 id="settings-title" data-i18n="location">Speicherort</h3>
       <p class="muted" id="settings-info"></p>
       <p class="path" id="settings-path"></p>
       <div class="settings-actions" id="settings-actions">
         <button type="button" class="btn btn-primary" id="choose-folder">
           <svg class="icon" aria-hidden="true"><use href="#i-folder"/></svg>
-          <span>Ordner auswählen …</span>
+          <span data-i18n="choose_folder">Ordner auswählen …</span>
         </button>
-        <button type="button" class="btn btn-secondary" id="use-downloads">Downloads-Ordner verwenden</button>
+        <button type="button" class="btn btn-secondary" id="use-downloads" data-i18n="use_downloads">Downloads-Ordner verwenden</button>
       </div>
-      <p class="muted small">Alle Daten bleiben auf diesem Computer. Die Seite sendet nichts ins Internet.</p>
+      <p class="muted small" data-i18n="privacy">Alle Daten bleiben auf diesem Computer. Die Seite sendet nichts ins Internet.</p>
       <div class="dialog-buttons">
-        <button class="btn btn-secondary" value="close">Schließen</button>
+        <button class="btn btn-secondary" value="close" data-i18n="close">Schließen</button>
       </div>
     </form>
   </dialog>

@@ -5,6 +5,9 @@ counted; every line and the total are calculated instantly. **Speichern** create
 in exactly the same format as the desktop app.
 
 - Plain HTML, CSS and JavaScript ("vanilla JS"). No framework, no build step, no backend.
+- German and English: follows the browser language, with a **DE | EN** switch in the top bar
+  (the choice is remembered in the browser). In English the page is called **Cash Counter**.
+  All texts are in `i18n.js`; static texts in `index.html` are marked with `data-i18n="key"`.
 - **No data leaves the computer.** The page makes no network requests; nothing is uploaded.
 - Money is calculated in whole cents (no rounding errors).
 - Works on PC, tablet and phone. After the first visit it can also open offline
@@ -22,7 +25,8 @@ in exactly the same format as the desktop app.
 ```
 index.html            page structure
 style.css             design (same look as the desktop app)
-calc.js               denominations, integer-cent maths, number formats, TXT text
+calc.js               denominations, integer-cent maths, number formats (de/en), TXT text
+i18n.js               all German and English texts, language detection and switch
 storage.js            saving: into a chosen folder or as a download
 app.js                everything the page does (inputs, buttons, dialogs, settings)
 sw.js                 offline support (service worker)
@@ -86,7 +90,8 @@ It is served as a download (`vercel.json`) and never cached for offline use.
 After rebuilding the desktop app (`..\Kassensturz\build.bat`):
 
 1. Copy `..\Kassensturz\release\Kassensturz_Setup_1.0.0.exe` into `downloads\`.
-2. In `index.html`, update the size (`13,7 MB`) and the SHA-256 checksum. Get the checksum with:
+2. Update the size (`13,2 MB` / `13.2 MB`) in `index.html` and `i18n.js`, and the SHA-256
+   checksum in `index.html`. Get the checksum with:
    `powershell (Get-FileHash downloads\Kassensturz_Setup_1.0.0.exe).Hash`
 3. For a new version number, also rename the file and update the link and version text.
 

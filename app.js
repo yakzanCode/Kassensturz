@@ -1,12 +1,13 @@
-// Kassensturz – browser UI. No network requests: everything stays on this computer.
+// Kassensturz / Cash Counter – browser UI. No network requests: everything stays on this computer.
 import {
-  COINS, NOTES, ALL, parseQuantity, sanitizeInput, lineCents, formatEuro,
-  formatLineValue, baseFilename, numberedFilename, buildText,
+  COINS, NOTES, ALL, parseQuantity, sanitizeInput, lineCents, formatEuro, formatLineValue,
+  groupThousands, denomName, baseFilename, numberedFilename, buildText,
 } from "./calc.js";
 import { writeToFolder, download } from "./storage.js";
+import { t, lang, setLanguage, detectLanguage } from "./i18n.js";
 
 const $ = (id) => document.getElementById(id);
-const rows = []; // { denom, input, value }
+const rows = []; // { denom, input, value, row, label, img }
 let savedSnapshot = null;
 
 // ------------------------------------------------------------------ build rows
@@ -19,14 +20,12 @@ function buildRows(container, denoms) {
     const img = document.createElement("img");
     img.className = "pic";
     img.src = `assets/${denom.asset}.webp`;
-    img.alt = denom.label;
     img.width = 68;
     img.height = 40;
     img.decoding = "async";
 
     const label = document.createElement("label");
     label.className = "label";
-    label.textContent = denom.label;
     label.htmlFor = `q-${denom.asset}`;
 
     const input = document.createElement("input");
@@ -38,7 +37,6 @@ function buildRows(container, denoms) {
     input.spellcheck = false;
     input.maxLength = 6;
     input.value = "0";
-    input.setAttribute("aria-label", `Stückzahl ${denom.label}`);
 
     const value = document.createElement("output");
     value.className = "value";
@@ -46,8 +44,30 @@ function buildRows(container, denoms) {
 
     row.append(img, label, input, value);
     container.append(row);
-    rows.push({ denom, input, value, row });
+    rows.push({ denom, input, value, row, label, img });
   }
+}
+
+/** Texts that depend on the language but are not in index.html. */
+function applyDynamicTexts() {
+  for (const r of rows) {
+    const name = denomName(r.denom, lang());
+    r.label.textContent = name;
+    r.img.alt = name;
+    r.input.setAttribute("aria-label", t("quantity_of", { name }));
+  }
+  $("today").textContent = new Date().toLocaleDateString(lang() === "en" ? "en-GB" : "de-DE", {
+    weekday: "long", day: "2-digit", month: "2-digit", year: "numeric",
+  });
+  recalculate();
+  updateSaveHint();
+  if ($("settings").open) renderSettings();
+}
+
+function switchLanguage(newLang) {
+  if (newLang === lang()) return;
+  setLanguage(newLang, { remember: true });
+  applyDynamicTexts();
 }
 
 // ------------------------------------------------------------------ input handling
@@ -64,18 +84,21 @@ function quantities() {
 
 function recalculate() {
   const q = quantities();
+  const l = lang();
   let coins = 0;
   let notes = 0;
   let pieces = 0;
   for (const r of rows) {
     const n = q.get(r.denom);
-    r.value.textContent = formatLineValue(r.denom, n);
+    r.value.textContent = formatLineValue(r.denom, n, l);
     r.row.classList.toggle("has-value", n > 0);
     pieces += n;
     if (r.denom.isNote) notes += lineCents(r.denom, n); else coins += lineCents(r.denom, n);
   }
-  const out = { coins: formatEuro(coins), notes: formatEuro(notes), total: formatEuro(coins + notes),
-    pieces: pieces.toLocaleString("de-DE") };
+  const out = {
+    coins: formatEuro(coins, l), notes: formatEuro(notes, l), total: formatEuro(coins + notes, l),
+    pieces: groupThousands(pieces, l),
+  };
   for (const el of document.querySelectorAll("[data-out]")) el.textContent = out[el.dataset.out];
 }
 
@@ -150,7 +173,7 @@ function ask(title, text, buttons, { cancel = null, error = false } = {}) {
     for (const b of buttons) {
       const btn = document.createElement("button");
       btn.type = "button";
-      btn.className = b.primary ? "btn btn-primary" : "btn";
+      btn.className = b.primary ? "btn btn-primary" : "btn btn-secondary";
       btn.textContent = b.label;
       btn.addEventListener("click", () => settle(b.value));
       bar.append(btn);
@@ -161,6 +184,9 @@ function ask(title, text, buttons, { cancel = null, error = false } = {}) {
     (focusBtn ?? bar.firstElementChild).focus();
   });
 }
+
+const okButton = () => [{ label: t("ok"), value: true, primary: true }];
+const yesNo = () => [{ label: t("yes"), value: true }, { label: t("no"), value: false, primary: true }];
 
 // ------------------------------------------------------------------ save folder (File System Access API)
 
@@ -188,18 +214,12 @@ const loadFolder = () => kv("readonly", (s) => s.get("folder")).catch(() => null
 const storeFolder = (h) => kv("readwrite", (s) => (h ? s.put(h, "folder") : s.delete("folder")));
 
 function updateSaveHint() {
-  $("save-hint").textContent = folder
-    ? `Speichern in: Ordner „${folder.name}“`
-    : "Speichern in: Downloads-Ordner";
-  $("save-location").title = "Speicherort ändern";
+  $("save-hint").textContent = folder ? t("save_to_folder", { name: folder.name }) : t("save_to_downloads");
 }
 
 function renderSettings() {
-  $("settings-info").textContent = canPickFolder
-    ? "In diesem Ordner werden die Kassensturz-Dateien (.txt) gespeichert."
-    : "Dieser Browser speichert die Dateien im Downloads-Ordner. "
-      + "Einen eigenen Ordner können Sie in Microsoft Edge oder Google Chrome wählen.";
-  $("settings-path").textContent = folder ? `Ordner: ${folder.name}` : "Downloads-Ordner des Browsers";
+  $("settings-info").textContent = canPickFolder ? t("location_info") : t("location_info_downloads");
+  $("settings-path").textContent = folder ? t("folder", { name: folder.name }) : t("downloads_folder");
   $("settings-actions").hidden = !canPickFolder;
   $("use-downloads").hidden = !folder;
 }
@@ -211,8 +231,7 @@ async function chooseFolder() {
     await storeFolder(handle).catch(() => {});
   } catch (e) {
     if (e?.name !== "AbortError") {
-      await ask("Einstellungen", "Der Ordner konnte nicht ausgewählt werden.", [{ label: "OK", value: true, primary: true }],
-        { error: true });
+      await ask(t("settings"), t("folder_error"), okButton(), { error: true });
     }
   }
   renderSettings();
@@ -245,36 +264,33 @@ async function save() {
     const q = quantities();
 
     if (![...q.values()].some((n) => n > 0)) {
-      const ok = await ask("Speichern", "Alle Stückzahlen sind 0.\nMöchten Sie trotzdem speichern?",
-        [{ label: "Ja", value: true }, { label: "Nein", value: false, primary: true }], { cancel: false });
+      const ok = await ask(t("save"), t("empty_question"), yesNo(), { cancel: false });
       if (!ok) return;
     }
 
     const now = new Date();
-    const text = buildText(q, now);
+    const text = buildText(q, now, lang());
     const base = baseFilename(now);
     let name;
     let where;
     try {
       if (folder) {
-        if (!(await ensurePermission(folder))) throw new Error("Keine Berechtigung");
+        if (!(await ensurePermission(folder))) throw new Error("permission denied");
         name = await writeToFolder(folder, base, text);
-        where = `Ordner: ${folder.name}`;
+        where = t("folder", { name: folder.name });
       } else {
         name = numberedFilename(base, 1);
         download(name, text);
-        where = "Downloads-Ordner";
+        where = t("where_downloads");
       }
     } catch {
-      await ask("Speichern fehlgeschlagen",
-        "Die Datei konnte nicht gespeichert werden. Bitte überprüfen Sie den ausgewählten Speicherort.",
-        [{ label: "OK", value: true, primary: true }], { error: true });
+      await ask(t("save_failed_title"), t("save_failed"), okButton(), { error: true });
       return;
     }
     savedSnapshot = snapshot(q);
 
-    const choice = await ask("Gespeichert", `Kassensturz wurde gespeichert.\n\n${name}\n${where}\n\nNeue Zählung starten?`,
-      [{ label: "Schließen", value: "close" }, { label: "Neue Zählung", value: "new", primary: true }]);
+    const choice = await ask(t("saved_title"), t("saved_message", { name, where }),
+      [{ label: t("close"), value: "close" }, { label: t("new_count"), value: "new", primary: true }]);
     if (choice === "new") setAllZero();
   } finally {
     saving = false;
@@ -282,8 +298,7 @@ async function save() {
 }
 
 async function reset() {
-  const ok = await ask("Zurücksetzen", "Möchten Sie alle Eingaben zurücksetzen?",
-    [{ label: "Ja", value: true }, { label: "Nein", value: false, primary: true }], { cancel: false });
+  const ok = await ask(t("reset"), t("reset_question"), yesNo(), { cancel: false });
   if (ok) setAllZero();
 }
 
@@ -298,17 +313,18 @@ async function init() {
   buildRows($("coin-rows"), COINS);
   buildRows($("note-rows"), NOTES);
   wireInputs();
-  recalculate();
+  setLanguage(detectLanguage());
+  applyDynamicTexts();
 
-  $("today").textContent = new Date().toLocaleDateString("de-DE", {
-    weekday: "long", day: "2-digit", month: "2-digit", year: "numeric",
-  });
   $("save").addEventListener("click", save);
   $("reset").addEventListener("click", reset);
   $("open-settings").addEventListener("click", openSettings);
   $("save-location").addEventListener("click", openSettings);
   $("choose-folder").addEventListener("click", chooseFolder);
   $("use-downloads").addEventListener("click", useDownloads);
+  for (const btn of document.querySelectorAll("[data-lang]")) {
+    btn.addEventListener("click", () => switchLanguage(btn.dataset.lang));
+  }
 
   document.addEventListener("keydown", (e) => {
     if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "s") {

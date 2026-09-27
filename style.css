@@ -66,7 +66,22 @@ body {
 .brand-text { display: flex; flex-direction: column; line-height: 1.2; min-width: 0; }
 .brand-name { font-size: 1.125rem; font-weight: 650; letter-spacing: -0.01em; }
 .brand-date { font-size: 0.8125rem; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.appbar-actions { display: flex; gap: 4px; }
+.appbar-actions { display: flex; align-items: center; gap: 4px; }
+
+/* DE | EN switch */
+.lang-switch {
+  display: inline-flex; padding: 3px; margin-right: 4px;
+  background: var(--surface-2); border: 1px solid var(--border); border-radius: 10px;
+}
+.lang-btn {
+  min-width: 40px; min-height: 36px; padding: 0 10px;
+  font: inherit; font-size: 0.8125rem; font-weight: 650; letter-spacing: 0.03em;
+  border: 0; border-radius: 7px; background: transparent; color: var(--muted); cursor: pointer;
+  transition: background-color 150ms var(--ease), color 150ms var(--ease);
+}
+.lang-btn:hover { color: var(--text); }
+.lang-btn[aria-pressed="true"] { background: var(--surface); color: var(--text); box-shadow: var(--shadow); }
+.lang-btn:focus-visible { outline: 3px solid var(--focus); outline-offset: 1px; }
 
 /* ---------------------------------------------------------------- buttons */
 .btn {
@@ -272,8 +287,12 @@ dialog.error h3 { color: var(--danger); }
 .noscript { text-align: center; padding: 24px; }
 
 /* ---------------------------------------------------------------- phone details */
+@media (max-width: 719px) {
+  .hide-md { display: none; }
+}
 @media (max-width: 479px) {
   .hide-sm { display: none; }
+  .brand-date { display: none; }
   .appbar-actions .btn { padding: 0 12px; }
   #total { font-size: 1.5rem; }
   .summary-actions .btn-lg { padding: 0 16px; }
