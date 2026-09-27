@@ -1,0 +1,11 @@
+{
+  "name": "kassensturz-web",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Kassensturz - cash counting in the browser. Static site, no backend.",
+  "type": "module",
+  "scripts": {
+    "test": "node --test",
+    "start": "npx --yes serve@14 -l 5173 ."
+  }
+}

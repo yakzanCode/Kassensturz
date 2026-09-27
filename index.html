@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Kassensturz</title>
+  <meta name="description" content="Kassensturz – Münzen und Scheine zählen, Summe automatisch berechnen, als TXT speichern.">
+  <meta name="theme-color" content="#1F4E79">
+  <link rel="icon" href="assets/favicon.ico" sizes="any">
+  <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="stylesheet" href="style.css">
+  <script type="module" src="app.js"></script>
+</head>
+<body>
+  <div class="page">
+    <header class="top">
+      <h1>KASSENSTURZ</h1>
+      <span class="date" id="today"></span>
+      <button type="button" class="btn btn-quiet" id="open-settings" tabindex="-1">
+        <span aria-hidden="true">⚙</span> Einstellungen
+      </button>
+    </header>
+
+    <main class="cards">
+      <section class="card" aria-labelledby="h-coins">
+        <h2 id="h-coins">MÜNZEN</h2>
+        <div class="rows" id="coin-rows"></div>
+        <div class="subtotal"><span>Summe Münzen</span><output id="coin-sum">0,00 €</output></div>
+      </section>
+      <section class="card" aria-labelledby="h-notes">
+        <h2 id="h-notes">SCHEINE</h2>
+        <div class="rows" id="note-rows"></div>
+        <div class="subtotal"><span>Summe Scheine</span><output id="note-sum">0,00 €</output></div>
+      </section>
+    </main>
+
+    <footer class="bottom">
+      <div class="total">
+        <span class="total-caption">GESAMT</span>
+        <output id="total" aria-live="polite">0,00 €</output>
+      </div>
+      <div class="actions">
+        <button type="button" class="btn btn-big" id="reset">Zurücksetzen</button>
+        <button type="button" class="btn btn-big btn-primary" id="save">Speichern</button>
+      </div>
+      <p class="hint" id="save-hint"></p>
+    </footer>
+  </div>
+
+  <noscript><p class="noscript">Bitte JavaScript aktivieren, um Kassensturz zu verwenden.</p></noscript>
+
+  <!-- Generic question / message dialog -->
+  <dialog id="dialog" aria-labelledby="dialog-title">
+    <form method="dialog">
+      <h3 id="dialog-title"></h3>
+      <p id="dialog-text"></p>
+      <div class="dialog-buttons" id="dialog-buttons"></div>
+    </form>
+  </dialog>
+
+  <!-- Settings -->
+  <dialog id="settings" aria-labelledby="settings-title">
+    <form method="dialog">
+      <h3 id="settings-title">Speicherort</h3>
+      <p class="muted" id="settings-info"></p>
+      <p class="path" id="settings-path"></p>
+      <div class="settings-actions" id="settings-actions">
+        <button type="button" class="btn btn-primary" id="choose-folder">Ordner auswählen …</button>
+        <button type="button" class="btn" id="use-downloads">Downloads-Ordner verwenden</button>
+      </div>
+      <p class="muted small">Alle Daten bleiben auf diesem Computer. Die Seite sendet nichts ins Internet.</p>
+      <div class="dialog-buttons">
+        <button class="btn" value="close">Schließen</button>
+      </div>
+    </form>
+  </dialog>
+</body>
+</html>
