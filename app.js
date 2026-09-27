@@ -20,8 +20,8 @@ function buildRows(container, denoms) {
     img.className = "pic";
     img.src = `assets/${denom.asset}.webp`;
     img.alt = denom.label;
-    img.width = 72;
-    img.height = 44;
+    img.width = 68;
+    img.height = 40;
     img.decoding = "async";
 
     const label = document.createElement("label");
@@ -46,7 +46,7 @@ function buildRows(container, denoms) {
 
     row.append(img, label, input, value);
     container.append(row);
-    rows.push({ denom, input, value });
+    rows.push({ denom, input, value, row });
   }
 }
 
@@ -66,14 +66,17 @@ function recalculate() {
   const q = quantities();
   let coins = 0;
   let notes = 0;
+  let pieces = 0;
   for (const r of rows) {
     const n = q.get(r.denom);
     r.value.textContent = formatLineValue(r.denom, n);
+    r.row.classList.toggle("has-value", n > 0);
+    pieces += n;
     if (r.denom.isNote) notes += lineCents(r.denom, n); else coins += lineCents(r.denom, n);
   }
-  $("coin-sum").textContent = formatEuro(coins);
-  $("note-sum").textContent = formatEuro(notes);
-  $("total").textContent = formatEuro(coins + notes);
+  const out = { coins: formatEuro(coins), notes: formatEuro(notes), total: formatEuro(coins + notes),
+    pieces: pieces.toLocaleString("de-DE") };
+  for (const el of document.querySelectorAll("[data-out]")) el.textContent = out[el.dataset.out];
 }
 
 function normalize(input) {
@@ -186,8 +189,9 @@ const storeFolder = (h) => kv("readwrite", (s) => (h ? s.put(h, "folder") : s.de
 
 function updateSaveHint() {
   $("save-hint").textContent = folder
-    ? `Speicherort: Ordner „${folder.name}“`
-    : "Speicherort: Downloads-Ordner des Browsers";
+    ? `Speichern in: Ordner „${folder.name}“`
+    : "Speichern in: Downloads-Ordner";
+  $("save-location").title = "Speicherort ändern";
 }
 
 function renderSettings() {
@@ -302,6 +306,7 @@ async function init() {
   $("save").addEventListener("click", save);
   $("reset").addEventListener("click", reset);
   $("open-settings").addEventListener("click", openSettings);
+  $("save-location").addEventListener("click", openSettings);
   $("choose-folder").addEventListener("click", chooseFolder);
   $("use-downloads").addEventListener("click", useDownloads);
 

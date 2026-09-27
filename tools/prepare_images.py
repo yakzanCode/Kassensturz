@@ -37,11 +37,35 @@ def trim(im, threshold=40):
     return im.crop(box) if box else im
 
 
+def clear_background(im, tolerance=28):
+    """Make the white photo background around a coin transparent.
+
+    Only white that is connected to the picture's edge is removed (flood fill),
+    so bright spots inside the coin stay untouched.
+    """
+    from PIL import ImageDraw, ImageFilter
+    rgb = im.convert("RGB")
+    diff = ImageChops.difference(rgb, Image.new("RGB", im.size, "white")).convert("L")
+    mask = diff.point(lambda v: 255 if v <= tolerance else 0)  # near-white = 255
+    w, h = mask.size
+    for x, y in [(x, 0) for x in range(0, w, 8)] + [(x, h - 1) for x in range(0, w, 8)] + \
+                [(0, y) for y in range(0, h, 8)] + [(w - 1, y) for y in range(0, h, 8)]:
+        if mask.getpixel((x, y)) == 255:
+            ImageDraw.floodfill(mask, (x, y), 128)
+    background = mask.point(lambda v: 255 if v == 128 else 0).filter(ImageFilter.GaussianBlur(1.2))
+    im = im.copy()
+    im.putalpha(ImageChops.subtract(im.getchannel("A"), background))
+    return im
+
+
 def main():
     OUT.mkdir(exist_ok=True)
     for name in NAMES:
         with Image.open(SOURCE / f"{name}.png") as im:
-            im = trim(im.convert("RGBA"))
+            im = im.convert("RGBA")
+            if name.startswith("coin"):
+                im = clear_background(im)
+            im = trim(im)
             im.thumbnail(COIN_BOX if name.startswith("coin") else NOTE_BOX, Image.LANCZOS)
             im.save(OUT / f"{name}.webp", quality=86, method=6)
     with Image.open(SOURCE / "kassensturz.png") as icon:

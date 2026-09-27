@@ -28,6 +28,7 @@ app.js                everything the page does (inputs, buttons, dialogs, settin
 sw.js                 offline support (service worker)
 manifest.webmanifest  lets Edge/Chrome install the page as an app
 assets/               coin and note pictures (WebP) and icons
+downloads/            Windows installer of the desktop app
 vercel.json           Vercel settings: strict security headers
 .vercelignore         files that are NOT uploaded to Vercel (tests, tools, …)
 tests/calc.test.mjs   automatic tests for the calculations
@@ -76,6 +77,32 @@ browser picks up the new version.
 plan if you use it at work. The page will be public, including the money pictures, so make sure
 you are allowed to publish those images.
 
+## Desktop app download
+
+The page offers the Windows installer at `downloads/Kassensturz_Setup_1.0.0.exe`
+(section "Kassensturz als Desktop-App", and the "Desktop-App" link in the top bar).
+It is served as a download (`vercel.json`) and never cached for offline use.
+
+After rebuilding the desktop app (`..\Kassensturz\build.bat`):
+
+1. Copy `..\Kassensturz\release\Kassensturz_Setup_1.0.0.exe` into `downloads\`.
+2. In `index.html`, update the size (`13,7 MB`) and the SHA-256 checksum. Get the checksum with:
+   `powershell (Get-FileHash downloads\Kassensturz_Setup_1.0.0.exe).Hash`
+3. For a new version number, also rename the file and update the link and version text.
+
+The installer is not digitally signed, so Edge/Windows may warn when it is downloaded or started.
+
+## Layout
+
+| Screen | Layout |
+|---|---|
+| Phone (< 720 px) | One column; total, Speichern and Zurücksetzen pinned at the bottom |
+| Tablet (720–1179 px) | Coins and notes side by side; summary bar pinned at the bottom |
+| Desktop (≥ 1180 px) | Coins, notes and a summary panel on the right |
+
+Each denomination row switches between a one-line and a two-line layout depending on the width
+of its card (CSS container queries).
+
 ## Changing the pictures
 
 Replace the pictures in the desktop project (`..\Kassensturz\assets\`), then run:
@@ -84,4 +111,5 @@ Replace the pictures in the desktop project (`..\Kassensturz\assets\`), then run
 "C:\Users\yakza\Desktop\Kassensturz\.venv\Scripts\python.exe" tools\prepare_images.py
 ```
 
-It trims white borders and writes small WebP files into `assets/`.
+It trims white borders, makes the white background around the coins transparent and writes
+small WebP files into `assets/`. After changing pictures, raise the cache version in `sw.js`.
