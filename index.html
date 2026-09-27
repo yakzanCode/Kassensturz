@@ -20,6 +20,8 @@
     <symbol id="i-save" viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><path d="M17 21v-8H7v8"/><path d="M7 3v5h8"/></symbol>
     <symbol id="i-reset" viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></symbol>
     <symbol id="i-folder" viewBox="0 0 24 24"><path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2z"/></symbol>
+    <symbol id="i-store" viewBox="0 0 24 24"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></symbol>
+    <symbol id="i-refresh" viewBox="0 0 24 24"><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-15 6.7L3 16"/><path d="M8 16H3v5"/></symbol>
     <symbol id="i-monitor" viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8"/><path d="M12 17v4"/></symbol>
     <symbol id="i-shield" viewBox="0 0 24 24"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="m9 12 2 2 4-4"/></symbol>
     <symbol id="i-wifi-off" viewBox="0 0 24 24"><path d="M12 20h.01"/><path d="M8.5 16.43a5 5 0 0 1 7 0"/><path d="M2 8.82a15 15 0 0 1 4.18-2.65"/><path d="M19 12.86a10 10 0 0 0-2.18-1.55"/><path d="M5 12.86a10 10 0 0 1 5.17-2.69"/><path d="M22 8.82a15 15 0 0 0-11.29-3.76"/><path d="m2 2 20 20"/></symbol>
@@ -108,17 +110,23 @@
           <li><svg class="icon" aria-hidden="true"><use href="#i-wifi-off"/></svg><span data-i18n="dl_f1">Ohne Internet nutzbar</span></li>
           <li><svg class="icon" aria-hidden="true"><use href="#i-shield"/></svg><span data-i18n="dl_f2">Keine Administratorrechte nötig</span></li>
           <li><svg class="icon" aria-hidden="true"><use href="#i-folder"/></svg><span data-i18n="dl_f3">TXT-Dateien im gewählten Ordner</span></li>
+          <li><svg class="icon" aria-hidden="true"><use href="#i-refresh"/></svg><span data-i18n="dl_f4">Über den Microsoft Store: automatische Updates</span></li>
         </ul>
       </div>
       <div class="desktop-app-cta">
-        <a class="btn btn-primary btn-lg" id="download-setup"
-           href="downloads/Kassensturz_Setup_1.0.0.exe" download type="application/vnd.microsoft.portable-executable">
-          <svg class="icon" aria-hidden="true"><use href="#i-download"/></svg>
-          <span data-i18n="dl_button">Für Windows herunterladen</span>
+        <a class="btn btn-primary btn-lg" id="store-link"
+           href="https://apps.microsoft.com/detail/9PPQ83XTBH2J" target="_blank" rel="noopener noreferrer">
+          <svg class="icon" aria-hidden="true"><use href="#i-store"/></svg>
+          <span data-i18n="dl_store">Im Microsoft Store holen</span>
         </a>
-        <p class="meta" data-i18n="dl_meta">Version 1.0.0 · 13,2 MB · Windows 10 / 11</p>
+        <p class="meta" data-i18n="dl_meta">Kostenlos · Version 1.0.0 · Windows 10 / 11</p>
+        <a class="btn btn-secondary" id="download-setup"
+           href="downloads/Kassensturz_Setup_1.0.0.exe" download>
+          <svg class="icon" aria-hidden="true"><use href="#i-download"/></svg>
+          <span data-i18n="dl_button">Installer herunterladen (.exe, 13,2 MB)</span>
+        </a>
         <details class="install-help">
-          <summary data-i18n="dl_help">Hinweise zur Installation</summary>
+          <summary data-i18n="dl_help">Hinweise zum direkten Download</summary>
           <ol>
             <li data-i18n="dl_step1">Die heruntergeladene Datei Kassensturz_Setup_1.0.0.exe öffnen.</li>
             <li data-i18n="dl_step2">„Nur für mich installieren“ wählen – keine Administratorrechte nötig.</li>

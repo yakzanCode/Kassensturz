@@ -83,7 +83,12 @@ you are allowed to publish those images.
 
 ## Desktop app download
 
-The page offers the Windows installer at `downloads/Kassensturz_Setup_1.0.0.exe`
+The main button links to the Microsoft Store listing
+<https://apps.microsoft.com/detail/9PPQ83XTBH2J> ("Cash Counter - Kassensturz", Store ID
+`9PPQ83XTBH2J`). The Store version is signed by Microsoft (no SmartScreen warning) and updates
+automatically. The page works only once the app has passed certification and is published.
+
+As a second option, the page offers the Windows installer at `downloads/Kassensturz_Setup_1.0.0.exe`
 (section "Kassensturz als Desktop-App", and the "Desktop-App" link in the top bar).
 It is served as a download (`vercel.json`) and never cached for offline use.
 
